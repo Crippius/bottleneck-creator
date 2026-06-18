@@ -1,0 +1,2 @@
+timestamp;duration;seqNum;isFault;cores;args
+60;300;1;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas_fixed cpuoccupy -u 80 -p 72 -d 300

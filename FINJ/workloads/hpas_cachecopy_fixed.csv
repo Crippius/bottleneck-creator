@@ -1,0 +1,2 @@
+timestamp;duration;seqNum;isFault;cores;args
+60;300;1;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas cachecopy -c L3 -m 0.25 -p 72 -d 300

@@ -1,0 +1,7 @@
+timestamp;duration;seqNum;isFault;cores;args
+60;120;1;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas cpuoccupy -u 80 -p 72 -d 120
+180;120;2;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas cachecopy -c L3 -m 2.0 -p 72 -d 120
+300;120;3;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas branchmiss -p 72 -d 120
+420;120;4;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas pipestall -p 72 -d 120
+540;120;5;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas precwaste -p 72 -d 120
+660;120;6;True;None;taskset -c 0-71 /home/tcrippa/bottleneck_creator/hpas_bin/bin/hpas loadimb -p 72 -H 1000 -l 0 -f 0.01 -d 120
