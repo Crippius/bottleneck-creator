@@ -1,0 +1,10 @@
+hpas_bin/
+HPAS/hpas
+HPAS/hpas_fixed
+logs/
+results/
+scripts/engine_hosts.txt
+
+__pycache__/
+*.py[cod]
+*.log
