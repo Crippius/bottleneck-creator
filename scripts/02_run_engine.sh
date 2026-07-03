@@ -36,10 +36,8 @@ mkdir -p /tmp/hpas_tmp
 NODE_HOST=$(hostname)
 HOST_FILE="$REPO_DIR/scripts/engine_hosts.txt"
 
-# Keep one entry per host to avoid duplicate controller targets
-if [[ ! -f "$HOST_FILE" ]] || ! grep -Fxq "${NODE_HOST}:${ENGINE_PORT}" "$HOST_FILE"; then
-    echo "${NODE_HOST}:${ENGINE_PORT}" >> "$HOST_FILE"
-fi
+# Overwrite so the controller always connects to the current engine node
+echo "${NODE_HOST}:${ENGINE_PORT}" > "$HOST_FILE"
 
 echo "========================================"
 echo "FINJ engine starting"

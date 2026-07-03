@@ -42,9 +42,8 @@ static const char *pipestall_usage = "Pipeline Stall Anomaly (FIXED - no non-tem
     "-h, --help              Prints this message.\n";
 
 static void do_copy(const double *orig, double *swap, size_t dim) {
-    for (size_t m = 0; m < dim; m++)
-        for (size_t i = 0; i < dim; i++)
-            swap[dim * i + m] = orig[dim * m + i];
+    for (size_t i = 0; i < dim * dim; i++)
+        swap[i] = orig[i];
 }
 
 static void pipestall_worker(size_t dim, int sleep_ms, bool verbose) {

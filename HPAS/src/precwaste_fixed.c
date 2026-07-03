@@ -44,10 +44,14 @@ static const char *precwaste_usage = "Precision Waste Anomaly (FIXED - float + A
     "-h, --help              Prints this message.\n";
 
 static void do_mmm(const float *A, const float *B, float *C, int n) {
+    /* i-k-j order: inner j-loop has unit stride on all arrays → GCC vectorizes
+       to packed SP (XMM/YMM), producing the SP FP ops the detector measures. */
     for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            for (int k = 0; k < n; k++)
-                C[i * n + j] += A[i * n + k] * B[k * n + j];
+        for (int k = 0; k < n; k++) {
+            float aik = A[i * n + k];
+            for (int j = 0; j < n; j++)
+                C[i * n + j] += aik * B[k * n + j];
+        }
 }
 
 static void precwaste_worker(const float *A, const float *B, float *C,
