@@ -34,7 +34,7 @@ ENGINE_WAIT_TIMEOUT=300
 # ---- Workload -------------------------------------------------------------
 _WORKLOAD_ARG="${1:-}"
 if [[ -z "$_WORKLOAD_ARG" ]]; then
-    WORKLOAD="$REPO_DIR/FINJ/workloads/hpas_workload.csv"
+    WORKLOAD="$REPO_DIR/FINJ/workloads/hpas_workload_fixed.csv"
 elif [[ "$_WORKLOAD_ARG" = /* ]]; then
     WORKLOAD="$_WORKLOAD_ARG"
 else
