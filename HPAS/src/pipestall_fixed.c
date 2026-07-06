@@ -10,15 +10,18 @@
 #include "src/utils.h"
 
 /*
- * FIXED: plain assignment instead of _mm_stream_pi non-temporal stores.
- * Normal stores go through the cache hierarchy and write-combine buffers are
- * not involved, so WC-buffer exhaustion stalls are eliminated.  The naïve
- * column-major write pattern (stride = dim) still causes cache misses, but the
- * CPU handles those via normal eviction — CPI drops well below the threshold
- * that triggers PIPELINE_STALL in the detector.
+ * FIXED: plain assignment instead of _mm_stream_pi non-temporal stores, and a
+ * much smaller working set. Normal stores go through the cache hierarchy and
+ * write-combine buffers are not involved, so WC-buffer exhaustion stalls are
+ * eliminated — but at the original dim=4096 (128MB/array) the flat copy still
+ * blows through L2/L3, and with -p 72 concurrent workers the aggregate DRAM
+ * bandwidth demand alone was enough to keep CPI (~6.5) above the detector's
+ * decision boundary (~5.8). At dim=128, both arrays (128 KB total) fit inside
+ * a single core's L2, so after the first pass the copy is cache-resident and
+ * CPI drops close to a normal compute-bound loop.
  */
 
-#define DEFAULT_PIPESTALL_DIM 4096
+#define DEFAULT_PIPESTALL_DIM 128
 
 static struct option const long_opt[] =
 {
@@ -33,7 +36,7 @@ static struct option const long_opt[] =
 };
 
 static const char *pipestall_usage = "Pipeline Stall Anomaly (FIXED - no non-temporal stores).\n\n"
-    "-n, --dim (=4096)       One dimension of the 2-D work arrays (dim × dim doubles).\n"
+    "-n, --dim (=128)        One dimension of the 2-D work arrays (dim × dim doubles).\n"
     "-d, --duration (=-1.0)  The total duration (in seconds), -1 for infinite.\n"
     "-t, --start (=0.0)      The time to wait (in seconds) before starting the anomaly.\n"
     "-r, --rate (=0)         Sleep between sweeps in ms; 0 = full speed.\n"

@@ -50,7 +50,7 @@ libpipestall_fixed_a_SOURCES = src/pipestall_fixed.c
 libpipestall_fixed_a_CFLAGS  = -O2
 
 libprecwaste_fixed_a_SOURCES = src/precwaste_fixed.c
-libprecwaste_fixed_a_CFLAGS  = -O2 -march=native
+libprecwaste_fixed_a_CFLAGS  = -O3 -march=native
 
 hpas_fixed_SOURCES = src/cachecopy.c src/iometadata.c \
                      src/main.c src/memeater.c src/memleak.c src/utils.c \
