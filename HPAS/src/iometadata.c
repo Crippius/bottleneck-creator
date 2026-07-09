@@ -106,7 +106,7 @@ int iometadata(int argc, char *argv[])
 
     char *tempdir = mkdtemp(foldername);
     if (tempdir == NULL) {
-        fprintf(stderr, "mkdtemp failed for template %s with the error: %s\n", 
+        fprintf(stderr, "mkdtemp failed for template %s with the error: %s\n",
 		foldername, strerror(errno));
 	return -1;
     }
@@ -126,11 +126,11 @@ int iometadata(int argc, char *argv[])
     {
         sprintf(filename, "%s/%d", tempdir, k % 10);
         remove(filename);
-        // O_RDONLY: Read only
-        // O_CREAT: Create file if doesn't exist
-        // S_IRUSR: Set read rights for the owner true.
+
+
+
         fds[k % 10] = open(filename, O_RDWR | O_CREAT, S_IRUSR);
-        /* printf("Opened the file with fd = %d \n",fds[k % 10]); */
+
         strncpy(filenames[k % 10], filename, location_size + 10);
 
         write_result = write(fds[k  % 10], "a\n", 2);
@@ -141,7 +141,7 @@ int iometadata(int argc, char *argv[])
         if ((k % 10) == 9) {
             for (i=0; i < 10; i++) {
                 close(fds[i]);
-                /* printf("Closed the file with fd = %d \n",fds[i]); */
+
                 remove(filenames[i]);
             }
         }
@@ -164,5 +164,6 @@ int iometadata(int argc, char *argv[])
     free(location);
     return 0;
 }
+
 
 

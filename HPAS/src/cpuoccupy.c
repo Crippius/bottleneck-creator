@@ -48,7 +48,7 @@ static void cpuoccupy_worker(int percutil, double dursec, bool verbose) {
 
     while (1) {
         double t0 = now_sec();
-        /* spin doing real FP work for worktime seconds */
+
         do {
             for (int i = 0; i < 512; i++)
                 res = res * 1.0000001 + 1.0e-10;
@@ -155,3 +155,4 @@ int cpuoccupy(int argc, char *argv[]) {
     printf("Exiting cpuoccupy.\n");
     return 0;
 }
+

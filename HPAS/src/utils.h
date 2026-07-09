@@ -3,9 +3,10 @@
 
 extern unsigned int timer_flag;
 
-void set_duration(double duration); // Time in seconds
-void hpas_sleep(double sleeptime);  // Time in seconds
+void set_duration(double duration);
+void hpas_sleep(double sleeptime);
 
 long int parse_size(char *input);
 
-#endif /* UTILS_H_ */
+#endif
+

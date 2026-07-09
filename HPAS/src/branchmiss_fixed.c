@@ -12,10 +12,7 @@
 #include <immintrin.h>
 #include "src/utils.h"
 
-/* FIXED: all c[i] = 1.0 → branch is always not-taken → predictor learns
- * immediately. The pragma stays so the branch instruction remains in the
- * generated code, but the predictor achieves ~0% misprediction rate after
- * the first sweep through the array. */
+
 
 #define DEFAULT_BRANCHMISS_SIZE  (64 * 1024 * 1024)
 
@@ -43,7 +40,7 @@ static const char *branchmiss_usage = "Branch Misprediction Anomaly (FIXED - no 
 #pragma GCC push_options
 #pragma GCC optimize("no-tree-vectorize,no-if-conversion")
 static void do_branch_work(double *a, double *b, double *c, double *d, int n) {
-    /* All values positive: branch is always not-taken, predictor learns. */
+
     for (int i = 0; i < n; i++)
         c[i] = 1.0;
     volatile double sink = 0.0;
@@ -157,3 +154,4 @@ int branchmiss(int argc, char *argv[]) {
     printf("\nExiting branchmiss (FIXED).\n");
     return 0;
 }
+

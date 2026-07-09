@@ -105,10 +105,10 @@ int netoccupy(int argc, char *argv[])
         fflush(stdout);
     }
 
-    // This section needs to be changed for correct node no. parsing
+
     gethostname(hostname, sizeof(hostname));
     sscanf(hostname, "nid%d", hostnum);
-    // end section
+
 
     shmem_barrier_all();
     shmem_fcollect32(all_hosts, hostnum, 1, 0, 0, numprocs, pSync);
@@ -177,7 +177,7 @@ int netoccupy(int argc, char *argv[])
         }
     }
 
-    /* touch the data */
+
     for(i = 0; i < size; i++) {
         s_buf[i] = 'a';
         r_buf[i] = 'b';
@@ -227,3 +227,4 @@ int netoccupy(int argc, char *argv[])
 
     return 0;
 }
+

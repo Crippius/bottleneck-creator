@@ -96,10 +96,7 @@ int memleak(int argc, char *argv[])
             asctime(timeinfo), size, period, duration);
     fflush(stdout);
 
-    /* this is a loop calling the malloc function which
-     * allocates the memory but without saving the address of the
-     * allocated place
-     */
+
     set_duration(duration);
     while (timer_flag) {
         hpas_sleep(period);
@@ -107,7 +104,7 @@ int memleak(int argc, char *argv[])
         char *temp = malloc(size * sizeof(char));
         if (!temp){
             break;
-            /* malloc will return NULL sooner or later, due to lack of memory */
+
         }
 
         for (j = 0; j < size; j++){
@@ -131,6 +128,7 @@ int memleak(int argc, char *argv[])
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     printf("%sFinished leak.\n", asctime(timeinfo));
-    return keep + 0 - keep; /* suppress unused variable warning */
-    /* free the allocated memory by operating system itself after program exits */
+    return keep + 0 - keep;
+
 }
+

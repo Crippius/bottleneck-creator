@@ -12,7 +12,7 @@
 #include <immintrin.h>
 #include "src/utils.h"
 
-#define DEFAULT_BRANCHMISS_SIZE  (64 * 1024 * 1024)   /* 64 MB per array */
+#define DEFAULT_BRANCHMISS_SIZE  (64 * 1024 * 1024)
 
 static struct option const long_opt[] =
 {
@@ -35,30 +35,19 @@ static const char *branchmiss_usage = "Branch Misprediction Anomaly.\n\n"
     "-v, --verbose           Prints execution information.\n"
     "-h, --help              Prints this message.\n";
 
-/*
- * Suppress auto-vectorization and if-conversion: with -O2 the compiler would
- * replace the data-dependent branch with a SIMD predicated instruction or cmov,
- * eliminating all mispredictions and defeating the anomaly.
- *
- * c[] is filled each sweep via RDRAND (hardware entropy). One 64-bit sample
- * yields two independent doubles — upper/lower 32 bits each cast to int32_t
- * and scaled to (-1, 1) with arbitrary magnitude. Arbitrary magnitude prevents
- * the compiler from unifying both branch arms into b[i] + |c[i]|*d[i].
- * RDRAND is cryptographically unpredictable, so the TAGE branch predictor
- * cannot learn the pattern regardless of history depth.
- */
+
 #pragma GCC push_options
 #pragma GCC optimize("no-tree-vectorize,no-if-conversion")
 static void do_branch_work(double *a, double *b, double *c, double *d, int n) {
     unsigned long long rv = 0;
-    /* Two elements per RDRAND call: upper 32 bits → c[i], lower → c[i+1]. */
+
     int i;
     for (i = 0; i < n - 1; i += 2) {
         while (!_rdrand64_step(&rv));
         c[i]     = (double)(int32_t)(rv >> 32)          * (1.0 / 2147483648.0);
         c[i + 1] = (double)(int32_t)(rv & 0xFFFFFFFFu)  * (1.0 / 2147483648.0);
     }
-    if (i < n) {  /* n is odd */
+    if (i < n) {
         while (!_rdrand64_step(&rv));
         c[i] = (double)(int32_t)(rv >> 32) * (1.0 / 2147483648.0);
     }
@@ -173,3 +162,4 @@ int branchmiss(int argc, char *argv[]) {
     printf("\nExiting branchmiss.\n");
     return 0;
 }
+

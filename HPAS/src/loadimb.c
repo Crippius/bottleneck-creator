@@ -7,9 +7,9 @@
 #include <omp.h>
 #include "src/utils.h"
 
-#define DEFAULT_LOADIMB_ELEMS      131072   /* array elements per thread */
-#define DEFAULT_LOADIMB_HIGH_ITERS 100      /* slow-half iteration count */
-#define DEFAULT_LOADIMB_LOW_ITERS  10       /* fast-half iteration count */
+#define DEFAULT_LOADIMB_ELEMS      131072
+#define DEFAULT_LOADIMB_HIGH_ITERS 100
+#define DEFAULT_LOADIMB_LOW_ITERS  10
 
 static struct option const long_opt[] =
 {
@@ -38,11 +38,7 @@ static const char *loadimb_usage = "Intra-Node Load Imbalance Anomaly.\n\n"
     "NOTE: -p must equal the number of cores the process is pinned to.\n"
     "      Example: taskset -c 0-3 hpas loadimb -p 4\n";
 
-/*
- * Per-thread LCG instead of rand(): glibc rand() holds a global lock, so all
- * threads serialise on every call — that collapses the fast/slow timing spread
- * and drives LIF to ~0 regardless of the iters split.
- */
+
 static void do_work(double *arrA, const double *arrB, int n, int iters, int tid) {
     unsigned int rng = (unsigned int)(tid + 1) * 2654435761u;
     for (int it = 0; it < iters; it++) {
@@ -104,9 +100,7 @@ int loadimb(int argc, char *argv[]) {
             int tid = omp_get_thread_num();
             int nt  = omp_get_num_threads();
 
-            /* slow_frac of threads are slow (high_iters), rest fast (low_iters).
-             * If low_iters==0: fast threads skip to barrier, maximising idle time.
-             * LIF = (T_max - T_avg)/T_max ≈ 1 - slow_frac when l=0. */
+
             int n_slow_local = (int)(nt * slow_frac + 0.5);
             if (n_slow_local < 1) n_slow_local = 1;
             int iters = (tid < nt - n_slow_local) ? low_iters : high_iters;
@@ -114,7 +108,7 @@ int loadimb(int argc, char *argv[]) {
             if (iters > 0) {
                 double *arrA = malloc((size_t)n * sizeof(double));
                 double *arrB = malloc((size_t)n * sizeof(double));
-                /* Per-thread LCG seed — avoids rand() global lock during init */
+
                 unsigned int seed = (unsigned int)(tid + 1) * 2654435761u;
                 for (int i = 0; i < n; i++) {
                     seed = seed * 1664525u + 1013904223u;
@@ -126,8 +120,7 @@ int loadimb(int argc, char *argv[]) {
                 free(arrB);
             }
 
-            /* Fast threads idle here until slow threads finish — this generates
-               the per-core flop/s spread that the heuristic engine measures. */
+
             #pragma omp barrier
         }
 
@@ -140,3 +133,4 @@ int loadimb(int argc, char *argv[]) {
     printf("\nExiting loadimb.\n");
     return 0;
 }
+

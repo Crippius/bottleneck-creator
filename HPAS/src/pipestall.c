@@ -10,22 +10,9 @@
 #include <stdbool.h>
 #include "src/utils.h"
 
-/*
- * Pipeline-stall anomaly via write-combining (WC) buffer exhaustion.
- *
- * The inner loop reads orig[dim*m + i] sequentially (stride-1, prefetchable)
- * and streams swap[dim*i + m] non-temporally with a stride of dim elements.
- * Because consecutive streaming stores target cache lines that are dim*8 bytes
- * apart, they land in different WC buffer slots.  Ice Lake has ~12 WC slots;
- * with dim >> 12 the buffer fills instantly and the pipeline stalls waiting for
- * DRAM write-combine flushes.  Result: high stall_rate and high CPI — same
- * mechanism as membw, which produces PIPELINE_STALL=0.5.
- *
- * Workers allocate their own private arrays (post-fork) so each process drives
- * an independent DRAM stream and there is no copy-on-write overhead.
- */
 
-#define DEFAULT_PIPESTALL_DIM 4096  /* 4096 × 4096 × 8B = 128 MB per array */
+
+#define DEFAULT_PIPESTALL_DIM 4096
 
 static struct option const long_opt[] =
 {
@@ -48,9 +35,7 @@ static const char *pipestall_usage = "Pipeline Stall Anomaly (WC-buffer exhausti
     "-v, --verbose           Prints execution information.\n"
     "-h, --help              Prints this message.\n";
 
-/* Non-temporal transposed copy: sequential reads, large-stride streaming writes.
- * Streaming writes bypass L3 and land in write-combine buffers; when dim > ~12
- * the WC buffer fills every inner-loop iteration → DRAM-flush stalls dominate. */
+
 static void do_stall(const double *orig, double *swap, size_t dim) {
     for (size_t m = 0; m < dim; m++) {
         for (size_t i = 0; i < dim; i++) {
@@ -157,3 +142,4 @@ int pipestall(int argc, char *argv[]) {
     printf("\nExiting pipestall.\n");
     return 0;
 }
+

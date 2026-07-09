@@ -31,8 +31,8 @@ void temporalCopy(const double *orig, double *swap, size_t size)
         for (i = 0; i < size; i++) {
              _mm_stream_pi(
                  (__m64 *) (&swap[size * i + m]),
-                 *(__m64 *) (&orig[size * m + i])); // MOVNTQ
-             _mm_empty(); // EMMS
+                 *(__m64 *) (&orig[size * m + i]));
+             _mm_empty();
         }
     }
 }
@@ -139,6 +139,7 @@ int membw(int argc, char *argv[])
     free(swap_array);
     return 0;
 }
+
 
 
 

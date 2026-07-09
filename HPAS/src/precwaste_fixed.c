@@ -9,18 +9,7 @@
 #include <stdbool.h>
 #include "src/utils.h"
 
-/*
- * FIXED: float (SP) instead of double (DP), compiled at -O3 -march=native.
- * GCC auto-vectorizes the j-loop with AVX2 (8 SP elements/cycle) and switches
- * loop order to i-k-j for better cache reuse.  The SP/DP FLOP ratio seen by
- * the detector goes from ~0 (broken, pure scalar DP) to essentially ∞ (all SP
- * packed SIMD), clearing PRECISION_WASTE.
- *
- * This file MUST be compiled with -O3 -march=native. GCC only enables
- * loop-level auto-vectorization (-ftree-vectorize) at -O3; at -O2 (even with
- * -march=native) the loop stays scalar and cpu_FLOPS_AVX_SP reads 0, which is
- * indistinguishable from the broken anomaly to the detector.
- */
+
 
 #define DEFAULT_PRECWASTE_N     512
 
@@ -46,8 +35,7 @@ static const char *precwaste_usage = "Precision Waste Anomaly (FIXED - float + A
     "-h, --help              Prints this message.\n";
 
 static void do_mmm(const float *A, const float *B, float *C, int n) {
-    /* i-k-j order: inner j-loop has unit stride on all arrays → GCC vectorizes
-       to packed SP (XMM/YMM), producing the SP FP ops the detector measures. */
+
     for (int i = 0; i < n; i++)
         for (int k = 0; k < n; k++) {
             float aik = A[i * n + k];
@@ -157,3 +145,4 @@ int precwaste(int argc, char *argv[]) {
     printf("\nExiting precwaste (FIXED).\n");
     return 0;
 }
+

@@ -9,12 +9,7 @@
 #include <stdbool.h>
 #include "src/utils.h"
 
-/*
- * This file MUST be compiled with -O0 -fno-tree-vectorize.  At higher
- * optimisation levels the compiler auto-vectorises the MMM loop and reorders
- * to i-k-j, replacing scalar FP instructions with SIMD units and producing a
- * near-one packed/scalar ratio — the opposite of the intended anomaly signal.
- */
+
 
 #define DEFAULT_PRECWASTE_N     512
 
@@ -125,7 +120,7 @@ int precwaste(int argc, char *argv[]) {
             pid_t pid = fork();
             if (pid == 0) {
                 signal(SIGTERM, SIG_DFL);
-                /* child gets its own COW copy of C on first memset write */
+
                 precwaste_worker(A, B, C, n, sleep_ms, false);
                 _exit(0);
             }
@@ -148,3 +143,4 @@ int precwaste(int argc, char *argv[]) {
     printf("\nExiting precwaste.\n");
     return 0;
 }
+

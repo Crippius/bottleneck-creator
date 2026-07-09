@@ -36,7 +36,7 @@ static double now_sec(void) {
     return ts.tv_sec + ts.tv_nsec * 1e-9;
 }
 
-/* AVX2+FMA: 4 independent double chains × 4 doubles/ymm × 2 FLOPs/FMA */
+
 #pragma GCC push_options
 #pragma GCC optimize("O3,tree-vectorize")
 #pragma GCC target("avx2,fma")
@@ -52,7 +52,7 @@ static void cpuoccupy_worker(int percutil, double dursec, bool verbose) {
     double sleeptime = interval - worktime;
     int counter = 0;
 
-    /* 256 doubles = 2 KB, stays in L1; independent elements → full AVX2 throughput */
+
     double a[256];
     for (int i = 0; i < 256; i++) a[i] = (double)(i + 1) * 0.001;
 
@@ -74,7 +74,7 @@ static void cpuoccupy_worker(int percutil, double dursec, bool verbose) {
             fflush(stdout);
         }
     }
-    /* prevent dead-code elimination of a[] */
+
     volatile double sink = a[0];
     (void)sink;
 }
@@ -168,3 +168,4 @@ int cpuoccupy(int argc, char *argv[]) {
     printf("Exiting cpuoccupy.\n");
     return 0;
 }
+

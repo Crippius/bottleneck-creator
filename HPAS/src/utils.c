@@ -28,13 +28,13 @@ void set_duration(double duration) {
     long utilsec, utilusec;
     utilsec = (long) duration;
     utilusec = (long) ((duration - (double) utilsec) * 1000000);
-    //set times for ending calc
+
     itv.it_interval.tv_sec = 1;
     itv.it_interval.tv_usec = 0;
     itv.it_value.tv_sec = utilsec;
     itv.it_value.tv_usec = utilusec;
 
-    //set up the signal for the calc
+
     sigaction(SIGALRM, &sa, NULL);
     setitimer(ITIMER_REAL, &itv, NULL);
 }
@@ -47,7 +47,7 @@ void hpas_sleep(double sleeptime) {
     sleeptv.tv_sec = sleepsec;
     sleeptv.tv_usec = sleepusec;
 
-    select(0,NULL,NULL,NULL,&sleeptv);   //do the sleep
+    select(0,NULL,NULL,NULL,&sleeptv);
 }
 
 ssize_t parse_size(char *input)
@@ -89,3 +89,4 @@ ssize_t parse_size(char *input)
     result *= ((unsigned long) 1) << (multiple * 10);
     return result;
 }
+

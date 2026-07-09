@@ -111,7 +111,7 @@ int memeater(int argc, char *argv[])
             temp = (int*) realloc (keep, (intcount + count) * sizeof(int));
             if (!temp){
               break;
-              /* malloc will return NULL sooner or later, due to lack of memory */
+
             }
 
             keep = temp;
@@ -146,3 +146,4 @@ int memeater(int argc, char *argv[])
     printf("%sFinished memeater.\n", asctime(timeinfo));
     return 0;
 }
+
