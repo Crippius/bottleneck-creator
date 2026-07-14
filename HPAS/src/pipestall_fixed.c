@@ -25,7 +25,7 @@ static struct option const long_opt[] =
     {NULL, 0, NULL, 0}
 };
 
-static const char *pipestall_usage = "Pipeline Stall Anomaly (FIXED - no non-temporal stores).\n\n"
+static const char *pipestall_usage = "Pipeline Stall Anomaly (FIXED - compute-bound with prefetch).\n\n"
     "-n, --dim (=2048)       One dimension of the 2-D work arrays (dim × dim doubles).\n"
     "-d, --duration (=-1.0)  The total duration (in seconds), -1 for infinite.\n"
     "-t, --start (=0.0)      The time to wait (in seconds) before starting the anomaly.\n"
@@ -34,10 +34,23 @@ static const char *pipestall_usage = "Pipeline Stall Anomaly (FIXED - no non-tem
     "-v, --verbose           Prints execution information.\n"
     "-h, --help              Prints this message.\n";
 
-static void do_copy(const double *orig, double *swap, size_t dim) {
-    for (size_t i = 0; i < dim * dim; i++)
-        swap[i] = orig[i];
+#pragma GCC push_options
+#pragma GCC optimize("O3,tree-vectorize")
+#pragma GCC target("avx2,fma")
+static void do_compute(const double *orig, double *swap, size_t dim) {
+    size_t n = dim * dim;
+    for (size_t i = 0; i < n; i++) {
+        if (i + 64 < n)
+            __builtin_prefetch(&orig[i + 64], 0, 0);
+        double v = orig[i];
+        v = v * 1.0000001 + 1.0e-10;
+        v = v * 1.0000001 + 1.0e-10;
+        v = v * 1.0000001 + 1.0e-10;
+        v = v * 1.0000001 + 1.0e-10;
+        swap[i] = v;
+    }
 }
+#pragma GCC pop_options
 
 static void pipestall_worker(size_t dim, int sleep_ms, bool verbose) {
     double *orig = malloc(dim * dim * sizeof(double));
@@ -50,7 +63,7 @@ static void pipestall_worker(size_t dim, int sleep_ms, bool verbose) {
 
     int counter = 0;
     while (timer_flag) {
-        do_copy(orig, swap, dim);
+        do_compute(orig, swap, dim);
         if (sleep_ms > 0)
             hpas_sleep(sleep_ms / 1000.0);
         if (verbose && ++counter % 10 == 0) {
