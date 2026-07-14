@@ -47,11 +47,10 @@ static void do_avx_work(double *a, int n) {
 #pragma GCC pop_options
 
 static void cpuoccupy_worker(int percutil, double dursec, bool verbose) {
-    double interval  = 0.1;
+    double interval  = 1.0;
     double worktime  = interval * (percutil / 100.0);
     double sleeptime = interval - worktime;
     int counter = 0;
-
 
     double a[256];
     for (int i = 0; i < 256; i++) a[i] = (double)(i + 1) * 0.001;

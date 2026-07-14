@@ -34,6 +34,9 @@ static const char *precwaste_usage = "Precision Waste Anomaly (FIXED - float + A
     "-v, --verbose           Prints execution information.\n"
     "-h, --help              Prints this message.\n";
 
+#pragma GCC push_options
+#pragma GCC optimize("O3,tree-vectorize")
+#pragma GCC target("avx2,fma")
 static void do_mmm(const float *A, const float *B, float *C, int n) {
 
     for (int i = 0; i < n; i++)
@@ -43,6 +46,7 @@ static void do_mmm(const float *A, const float *B, float *C, int n) {
                 C[i * n + j] += aik * B[k * n + j];
         }
 }
+#pragma GCC pop_options
 
 static void precwaste_worker(const float *A, const float *B, float *C,
                               int n, int sleep_ms, bool verbose) {
